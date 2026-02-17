@@ -3,10 +3,8 @@ import os from "os";
 import http from "http";
 import app from "./app";
 import { config } from "./config/env";
-
-// const numCPUs = os.cpus().length - 2;
-// console.log(numCPUs);
-const numCPUs = 1;
+import { redisClient } from "./config/redis";
+const numCPUs = os.cpus().length - 2;
 
 if (cluster.isPrimary) {
   console.log(`🚀 Master ${process.pid} is running`);
@@ -27,9 +25,9 @@ if (cluster.isPrimary) {
   async function main() {
     try {
       // Check Redis
-      // const pong = await redis.ping();
-      // if (pong === "PONG")
-      //   console.log(`✅ Worker ${process.pid} connected to Redis`);
+      const pong = await redisClient.ping();
+      if (pong === "PONG")
+        console.log(`✅ Worker ${process.pid} connected to Redis`);
 
       // Create HTTP server
       const server = http.createServer(app);

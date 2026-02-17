@@ -7,6 +7,10 @@ import * as Sentry from "@sentry/node";
 import { config } from "./config/env";
 import logger from "./middlewares/logger.middleware";
 import GlobalErrorHandler from "./middlewares/global.error.handler";
+import { connectKafka } from "./config/kafka";
+import router from "./routes";
+import { requestLogger } from "./middlewares/request.logger.middleware";
+import rateLimiter from "./middlewares/rateLimiter.middleware";
 
 // =======================
 // Sentry Setup (Error Monitoring)
@@ -56,7 +60,8 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(hpp());
 app.use(express.json({ limit: "10mb" }));
-// app.use(xssSanitizerMiddleware);
+app.use(requestLogger);
+app.use(rateLimiter(100));
 app.use(express.static("public"));
 
 app.get("/api/v1/csrf-token", (req: Request, res: Response) => {
@@ -101,6 +106,9 @@ app.use((req, res, next) => {
 app.get("/", (req: Request, res: Response) => {
   res.send({ message: "Welcome to the API" });
 });
+
+app.use("/", router);
+connectKafka().catch(console.error);
 
 // =======================
 // Global Error Handler
