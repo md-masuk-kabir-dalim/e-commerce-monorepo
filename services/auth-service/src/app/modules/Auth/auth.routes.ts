@@ -1,7 +1,5 @@
 import express from "express";
 import { AuthController } from "./auth.controller";
-import rateLimiter from "../../middlewares/rateLimiter.middleware";
-import auth from "../../middlewares/auth.middleware";
 
 const router = express.Router();
 
@@ -14,37 +12,36 @@ router.post("/admin/login", AuthController.loginAdmin);
 // ------------------------------
 // REGISTER USER
 // ------------------------------
-router.post("/register", rateLimiter(10), AuthController.registerUser);
+router.post("/register", AuthController.registerUser);
 
 // ------------------------------
 // LOGIN USER
 // ------------------------------
-router.post("/login", rateLimiter(10), AuthController.loginUser);
+router.post("/login", AuthController.loginUser);
 
 // ------------------------------
 // LOGOUT USER
 // ------------------------------
-router.post("/logout", auth(), rateLimiter(10), AuthController.logout);
+router.post("/logout", AuthController.logout);
 
 // ------------------------------
 // FORGOT PASSWORD
 // ------------------------------
-router.post("/forgot-password", rateLimiter(10), AuthController.forgetPassword);
+router.post("/forgot-password", AuthController.forgetPassword);
 
 // ------------------------------
 // RESET PASSWORD//
 // ------------------------------
 router.patch(
   "/reset-password",
-  auth(),
-  rateLimiter(10),
+
   AuthController.resetPassword,
 );
 
 // ------------------------------
 // VERIFY OTP
 // ------------------------------
-router.patch("/verify-otp", rateLimiter(10), AuthController.verifyUserByOTP);
+router.patch("/verify-otp", AuthController.verifyUserByOTP);
 
 // ------------------------------
 // REFRESH TOKEN
@@ -56,8 +53,7 @@ router.post("/refresh-token", AuthController.refreshToken);
 // ------------------------------
 router.patch(
   "/change-password",
-  rateLimiter(10),
-  auth(),
+
   AuthController.changePassword,
 );
 

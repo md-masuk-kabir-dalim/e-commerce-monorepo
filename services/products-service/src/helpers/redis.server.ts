@@ -29,7 +29,7 @@ const otpWorker = new Worker(
     await emailSender("OTP", identifier, html);
     return "OTP job completed";
   },
-  { connection: redis },
+  { connection: redis }
 );
 
 const cleanQueues = async () => {
