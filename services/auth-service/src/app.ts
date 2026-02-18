@@ -9,6 +9,7 @@ import GlobalErrorHandler from "./app/middlewares/global.error.handler";
 import config from "./config";
 import router from "./app/routes";
 import healthRoute from "./app/routes/health.route";
+import { redisClient } from "./config/redis";
 
 // =======================
 // Sentry Setup (Error Monitoring)
@@ -30,6 +31,10 @@ Sentry.init({
     } catch (err) {}
     return event;
   },
+});
+
+redisClient.on("connect", () => {
+  logger.info("Connected to Redis successfully!");
 });
 
 // =======================

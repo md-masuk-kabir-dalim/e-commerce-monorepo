@@ -1,14 +1,11 @@
 import Redis from "ioredis";
-const REDIS_HOST = process.env.REDIS_HOST || "localhost";
-const REDIS_PORT = Number(process.env.REDIS_PORT || 6379);
-const REDIS_PASSWORD =
-  process.env.REDIS_PASSWORD || "yourStrongRedisPassword123";
+const REDIS_HOST = (process.env.REDIS_HOST || "127.0.0.1").trim();
+const REDIS_PORT = Number(process.env.REDIS_PORT || 6380);
 
 export const createRedisClient = (serviceName: string) => {
   const client = new Redis({
     host: REDIS_HOST,
     port: REDIS_PORT,
-    password: REDIS_PASSWORD,
     maxRetriesPerRequest: 5,
     connectTimeout: 10000,
     keyPrefix: `${serviceName}:`,
