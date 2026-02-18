@@ -4,6 +4,7 @@ import http from "http";
 import app from "./app";
 import config from "./config";
 import { initAuthServiceDb } from "./config/database";
+import { initAuthKafka } from "./config/kafka";
 const numCPUs = os.cpus().length - 2;
 
 if (cluster.isPrimary) {
@@ -24,14 +25,10 @@ if (cluster.isPrimary) {
   // Worker process code
   async function main() {
     try {
-      // Check Redis
-      // const pong = await redis.ping();
-      // if (pong === "PONG")
-      //   console.log(`✅ Worker ${process.pid} connected to Redis`);
-
       // Create HTTP server
       const server = http.createServer(app);
       initAuthServiceDb();
+      initAuthKafka();
 
       // Start server
       server.listen(config.port, () => {

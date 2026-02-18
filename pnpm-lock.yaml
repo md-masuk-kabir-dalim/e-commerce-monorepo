@@ -11,6 +11,9 @@ importers:
       ioredis:
         specifier: ^5.9.3
         version: 5.9.3
+      kafkajs:
+        specifier: ^2.2.4
+        version: 2.2.4
       mongodb:
         specifier: ^7.1.0
         version: 7.1.0
@@ -87,6 +90,10 @@ packages:
   ioredis@5.9.3:
     resolution: {integrity: sha512-VI5tMCdeoxZWU5vjHWsiE/Su76JGhBvWF1MJnV9ZtGltHk9BmD48oDq8Tj8haZ85aceXZMxLNDQZRVo5QKNgXA==}
     engines: {node: '>=12.22.0'}
+
+  kafkajs@2.2.4:
+    resolution: {integrity: sha512-j/YeapB1vfPT2iOIUn/vxdyKEuhuY2PxMBvf5JWux6iSaukAccrMtXEY/Lb7OvavDhOWME589bpLrEdnVHjfjA==}
+    engines: {node: '>=14.0.0'}
 
   kareem@3.2.0:
     resolution: {integrity: sha512-VS8MWZz/cT+SqBCpVfNN4zoVz5VskR3N4+sTmUXme55e9avQHntpwpNq0yjnosISXqwJ3AQVjlbI4Dyzv//JtA==}
@@ -286,6 +293,8 @@ snapshots:
       standard-as-callback: 2.1.0
     transitivePeerDependencies:
       - supports-color
+
+  kafkajs@2.2.4: {}
 
   kareem@3.2.0: {}
 

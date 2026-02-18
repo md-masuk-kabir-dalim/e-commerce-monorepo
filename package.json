@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "ioredis": "^5.9.3",
+    "kafkajs": "^2.2.4",
     "mongodb": "^7.1.0",
     "mongoose": "^9.2.1"
   }
