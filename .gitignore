@@ -28,5 +28,3 @@ Thumbs.db
 *.njsproj
 *.sln
 
-# Optional: pnpm lockfile
-pnpm-lock.yaml
