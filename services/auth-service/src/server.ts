@@ -3,11 +3,8 @@ import os from "os";
 import http from "http";
 import app from "./app";
 import config from "./config";
-import connectDB from "./config/database";
-
-// const numCPUs = os.cpus().length - 2;
-// console.log(numCPUs);
-const numCPUs = 1;
+import { initAuthServiceDb } from "./config/database";
+const numCPUs = os.cpus().length - 2;
 
 if (cluster.isPrimary) {
   console.log(`🚀 Master ${process.pid} is running`);
@@ -34,7 +31,8 @@ if (cluster.isPrimary) {
 
       // Create HTTP server
       const server = http.createServer(app);
-      connectDB();
+      initAuthServiceDb();
+
       // Start server
       server.listen(config.port, () => {
         console.log(`✅ Worker ${process.pid} running on port ${config.port}`);

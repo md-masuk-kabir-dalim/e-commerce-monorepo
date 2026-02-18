@@ -1,15 +1,6 @@
-import mongoose from "mongoose";
-import config from ".";
+import { getMongooseConnection } from "infra/mongo/mongo.client";
 
-const connectDB = async () => {
-  try {
-    await mongoose.connect(config.database_url as string);
-
-    console.log("MongoDB Connected Successfully ✔");
-  } catch (error) {
-    console.error("MongoDB Connection Failed ❌", error);
-    process.exit(1);
-  }
-};
-
-export default connectDB;
+export async function initAuthServiceDb() {
+  await getMongooseConnection("auth_db");
+  console.log("Auth DB initialized successfully!");
+}
