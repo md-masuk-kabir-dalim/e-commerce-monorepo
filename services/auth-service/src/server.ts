@@ -20,9 +20,7 @@ if (cluster.isPrimary) {
   (async () => {
     try {
       await createKafkaTopics(Object.values(Topics));
-      console.log("[Kafka Admin] All topics already exist ✅");
     } catch (err) {
-      console.error("[Kafka Admin] Failed to create topics", err);
       process.exit(1);
     }
   })();
