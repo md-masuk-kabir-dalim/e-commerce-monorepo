@@ -1,15 +1,28 @@
 import mongoose from "mongoose";
-import config from ".";
 
-const connectDB = async () => {
+export async function initProductServiceDb() {
   try {
-    await mongoose.connect(config.database_url as string);
+    const MONGO_URI = `mongodb+srv://bdUser:uTpkFGBuxo2hTmbF@cluster0.s0tuw8w.mongodb.net/auth_db?retryWrites=true&w=majority&appName=Cluster0`;
 
-    console.log("MongoDB Connected Successfully ✔");
-  } catch (error) {
-    console.error("MongoDB Connection Failed ❌", error);
-    process.exit(1);
+    await mongoose.connect(MONGO_URI, {
+      autoIndex: true,
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 10000,
+    });
+
+    console.log(`✅ Mongoose connected successfully to "auth_db"`);
+
+    mongoose.connection.on("connected", () =>
+      console.log("🟢 Mongoose connection open"),
+    );
+    mongoose.connection.on("error", (err) =>
+      console.error("🔴 Mongoose connection error:", err),
+    );
+    mongoose.connection.on("disconnected", () =>
+      console.warn("⚪ Mongoose disconnected"),
+    );
+  } catch (err) {
+    console.error(`❌ Mongoose connection error for "auth_db":`, err);
+    throw err;
   }
-};
-
-export default connectDB;
+}

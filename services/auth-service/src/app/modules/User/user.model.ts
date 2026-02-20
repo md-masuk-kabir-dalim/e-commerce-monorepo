@@ -1,5 +1,6 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Connection, model, Schema } from "mongoose";
 import { IUser } from "./user.interface";
+import { getAuthConnection } from "../../../config/database";
 
 export enum UserRole {
   USER = "USER",
@@ -18,7 +19,7 @@ const imageSchema = new Schema(
     path: { type: String },
     altText: { type: String },
   },
-  { _id: false }//
+  { _id: false },
 );
 
 const UserSchema: Schema<IUser> = new Schema(
@@ -43,7 +44,7 @@ const UserSchema: Schema<IUser> = new Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 UserSchema.index({ fullName: 1 });
@@ -53,4 +54,16 @@ UserSchema.index({ status: 1 });
 UserSchema.index({ createdAt: 1 });
 UserSchema.index({ updatedAt: 1 });
 
-export default mongoose.model<IUser>("User", UserSchema, "users");
+let cachedUserModel: ReturnType<typeof model<any>> | null = null;
+
+export function getUserModel(connection: Connection) {
+  if (cachedUserModel) return cachedUserModel;
+
+  cachedUserModel = connection.model<IUser>("User", UserSchema);
+  return cachedUserModel;
+}
+
+export async function getUser() {
+  const connection = await getAuthConnection();
+  return getUserModel(connection);
+}

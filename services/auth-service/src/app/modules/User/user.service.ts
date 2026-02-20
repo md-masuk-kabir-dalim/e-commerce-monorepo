@@ -1,11 +1,10 @@
 import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiErrors";
 import { IPaginationOptions } from "../../../interfaces/pagination";
-import UserModel, { UserRole, UserStatus } from "./user.model";
+import { getUser, UserRole, UserStatus } from "./user.model";
 import { IUser } from "./user.interface";
 import { paginationHelpers } from "../../../utils/paginationHelper";
 import mongoose, { SortOrder } from "mongoose";
-import userModel from "./user.model";
 
 /*======================
   update user
@@ -15,6 +14,7 @@ const updateUser = async (
   id: string,
   payload: Partial<IUser>,
 ): Promise<IUser> => {
+  const UserModel = await getUser();
   const updatedUser = await UserModel.findByIdAndUpdate(
     id,
     {
@@ -36,7 +36,8 @@ const updateUser = async (
       GET PROFILE
 ===============================*/
 const getMyProfile = async (userId: string) => {
-  const user = await userModel.findById(userId);
+  const UserModel = await getUser();
+  const user = await UserModel.findById(userId);
   if (!user) throw new ApiError(httpStatus.NOT_FOUND, "User not found");
   const { password: _password, tokenVersion, ...userData } = user.toObject();
   return userData;
@@ -54,6 +55,7 @@ const getUsers = async (
     searchTerm?: string;
   },
 ) => {
+  const UserModel = await getUser();
   const { page, limit, sortBy, sortOrder, skip } =
     paginationHelpers.calculatePagination(options);
 
@@ -99,6 +101,7 @@ const getUsers = async (
 =============================
 */
 const getUserById = async (id: string): Promise<IUser> => {
+  const UserModel = await getUser();
   const user = await UserModel.findById(id);
 
   if (!user) {
@@ -113,6 +116,7 @@ const getUserById = async (id: string): Promise<IUser> => {
 =================================
 **/
 const deleteUser = async (userId: string): Promise<void> => {
+  const UserModel = await getUser();
   const user = await UserModel.findById(userId);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found");

@@ -1,5 +1,6 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Connection, Schema } from "mongoose";
 import { IOtp } from "./auth.interface";
+import { getAuthConnection } from "../../../config/database";
 
 export enum OtpType {
   EMAIL_VERIFICATION = "EMAIL_VERIFICATION",
@@ -25,10 +26,21 @@ const OtpSchema: Schema<IOtp> = new Schema(
     },
     expiresAt: { type: Date, required: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-// Explicit indexes
 OtpSchema.index({ type: 1 });
 
-export default mongoose.model<IOtp>("Otp", OtpSchema, "otps");
+let cachedOtpModel: ReturnType<typeof mongoose.model<any>> | null = null;
+
+export function getOtpModel(connection: Connection) {
+  if (cachedOtpModel) return cachedOtpModel;
+
+  cachedOtpModel = connection.model<IOtp>("Otp", OtpSchema);
+  return cachedOtpModel;
+}
+
+export async function getOtp() {
+  const connection = await getAuthConnection();
+  return getOtpModel(connection);
+}

@@ -2,14 +2,14 @@ import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiErrors";
 import { otpEmail } from "../../../emails/otpEmail";
 import config from "../../../config";
-import userModel, { UserRole, UserStatus } from "../User/user.model";
+import { getUser, UserRole, UserStatus } from "../User/user.model";
 import { IUser } from "../User/user.interface";
 import {
   comparePassword,
   hashPassword,
 } from "../../../helpers/password.helpers";
 import generateOtp from "../../../helpers/generate.otp";
-import otpModel, { OtpType } from "./otp.model";
+import { getOtp, OtpType } from "./otp.model";
 import emailSender from "../../../helpers/email.helper";
 import { jwtHelpers } from "../../../helpers/jwtHelpers";
 import { Types } from "mongoose";
@@ -18,6 +18,7 @@ import { Types } from "mongoose";
       ADMIN LOGIN
 ===============================*/
 const loginAdmin = async (email: string, password: string) => {
+  const userModel = await getUser();
   const user = await userModel.findOne({ email });
   if (!user) throw new ApiError(httpStatus.NOT_FOUND, "User not found");
 
@@ -67,6 +68,8 @@ const loginAdmin = async (email: string, password: string) => {
       REGISTER USER
 ===============================*/
 const registerUser = async (payload: IUser) => {
+  const userModel = await getUser();
+  const otpModel = await getOtp();
   const existingUser = await userModel.findOne({ email: payload.email });
   if (existingUser)
     throw new ApiError(httpStatus.BAD_REQUEST, "Email already in use");
@@ -105,6 +108,8 @@ const registerUser = async (payload: IUser) => {
       VERIFY USER OTP
 ===============================*/
 const verifyUserByOTP = async (email: string, otp: string) => {
+  const userModel = await getUser();
+  const otpModel = await getOtp();
   const user = await userModel.findOne({ email });
   if (!user) throw new ApiError(httpStatus.NOT_FOUND, "User not found");
 
@@ -144,6 +149,8 @@ const verifyUserByOTP = async (email: string, otp: string) => {
       LOGIN USER
 ===============================*/
 const loginUser = async (email: string, password: string) => {
+  const userModel = await getUser();
+  const otpModel = await getOtp();
   const user = await userModel.findOne({ email });
   if (!user) throw new ApiError(httpStatus.NOT_FOUND, "User not found");
 
@@ -205,6 +212,7 @@ const loginUser = async (email: string, password: string) => {
       REFRESH TOKEN
 ===============================*/
 const refreshToken = async (token: string) => {
+  const userModel = await getUser();
   const decoded = jwtHelpers.verifyToken(
     token,
     config.jwt.refresh_secret,
@@ -244,6 +252,8 @@ const refreshToken = async (token: string) => {
       FORGOT PASSWORD
 ===============================*/
 const forgetPassword = async (email: string) => {
+  const userModel = await getUser();
+  const otpModel = await getOtp();
   const user = await userModel.findOne({ email });
 
   if (!user) throw new ApiError(httpStatus.NOT_FOUND, "User not found");
@@ -268,6 +278,7 @@ const forgetPassword = async (email: string) => {
       RESET PASSWORD
 ===============================*/
 const resetPassword = async (email: string, newPassword: string) => {
+  const userModel = await getUser();
   const user = await userModel.findOne({ email });
   if (!user) throw new ApiError(httpStatus.NOT_FOUND, "User not found");
 
@@ -311,6 +322,7 @@ const changePassword = async (
   oldPassword: string,
   newPassword: string,
 ) => {
+  const userModel = await getUser();
   const user = await userModel.findById(userId);
   if (!user) throw new ApiError(httpStatus.NOT_FOUND, "User not found");
 
@@ -329,6 +341,7 @@ const changePassword = async (
         LOGOUT USER
 =========================== */
 const logout = async (userId: string) => {
+  const userModel = await getUser();
   const user = await userModel.findById(userId);
   if (!user) throw new ApiError(httpStatus.NOT_FOUND, "User not found");
 

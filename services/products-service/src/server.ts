@@ -3,7 +3,7 @@ import os from "os";
 import http from "http";
 import app from "./app";
 import config from "./config";
-import connectDB from "./config/database";
+import { initProductServiceDb } from "./config/database";
 
 // const numCPUs = os.cpus().length - 2;
 // console.log(numCPUs);
@@ -34,7 +34,7 @@ if (cluster.isPrimary) {
 
       // Create HTTP server
       const server = http.createServer(app);
-      connectDB();
+      initProductServiceDb();
       // Start server
       server.listen(config.port, () => {
         console.log(`✅ Worker ${process.pid} running on port ${config.port}`);
