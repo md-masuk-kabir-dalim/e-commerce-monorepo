@@ -7,6 +7,6 @@ router.get("/health", (req, res) => {
   res.send({ status: "ok" });
 });
 
-router.use("/auth", authProxy);
+router.use("/auth-service", authProxy);
 
 export default router;

@@ -4,12 +4,12 @@ import express, { Application, NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
 import hpp from "hpp";
 import * as Sentry from "@sentry/node";
-import logger from "./app/middlewares/logger.middleware";
 import GlobalErrorHandler from "./app/middlewares/global.error.handler";
 import config from "./config";
 import router from "./app/routes";
 import healthRoute from "./app/routes/health.route";
 import { redisClient } from "./config/redis";
+import { logger } from "./utils/logger";
 
 // =======================
 // Sentry Setup (Error Monitoring)

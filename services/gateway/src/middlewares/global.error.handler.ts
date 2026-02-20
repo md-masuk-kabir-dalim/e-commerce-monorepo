@@ -2,10 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
 import mongoose from "mongoose";
 import { ZodError } from "zod";
-import { logSecurityEvent } from "./audit.logger";
-import logger from "./logger.middleware";
 import { config } from "../config/env";
 import ApiError from "../errors/api.errors";
+import { logger } from "../utils/logger";
 
 interface IGenericErrorMessage {
   path: string;
@@ -32,7 +31,7 @@ const GlobalErrorHandler = (
 
   // ---------------------- Security logging ----------------------
   const logSecurity = (reason: string) => {
-    logSecurityEvent(reason, {
+    logger.error(reason, {
       path: req.originalUrl,
       ip: req.ip,
       method: req.method,

@@ -13,7 +13,6 @@ import otpModel, { OtpType } from "./otp.model";
 import emailSender from "../../../helpers/email.helper";
 import { jwtHelpers } from "../../../helpers/jwtHelpers";
 import { Types } from "mongoose";
-import { publishUserCreated } from "services/auth-service/src/config/kafka/publisher";
 
 /*==============================
       ADMIN LOGIN
@@ -92,11 +91,6 @@ const registerUser = async (payload: IUser) => {
     type: OtpType.EMAIL_VERIFICATION,
     expiresAt: expiry,
     userId,
-  });
-
-  publishUserCreated({
-    userId,
-    email: payload.email,
   });
 
   emailSender(

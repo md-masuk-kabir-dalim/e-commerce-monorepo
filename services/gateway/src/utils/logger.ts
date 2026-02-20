@@ -1,15 +1,3 @@
-import winston from "winston";
+import { createServiceLogger } from "shared/logger/logger";
 
-const logger = winston.createLogger({
-  level: "info",
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json(),
-  ),
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({ filename: "gateway.log", level: "info" }),
-  ],
-});
-
-export default logger;
+export const logger = createServiceLogger("gateway-service");

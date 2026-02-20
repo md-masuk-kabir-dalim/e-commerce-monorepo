@@ -5,11 +5,11 @@ import httpStatus from "http-status";
 import hpp from "hpp";
 import * as Sentry from "@sentry/node";
 import { config } from "./config/env";
-import logger from "./middlewares/logger.middleware";
 import GlobalErrorHandler from "./middlewares/global.error.handler";
 import router from "./routes";
 import { requestLogger } from "./middlewares/request.logger.middleware";
 import rateLimiter from "./middlewares/rateLimiter.middleware";
+import { logger } from "./utils/logger";
 
 // =======================
 // Sentry Setup (Error Monitoring)
