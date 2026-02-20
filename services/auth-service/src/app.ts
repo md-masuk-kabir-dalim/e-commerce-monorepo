@@ -63,7 +63,7 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(hpp());
 app.use(express.json({ limit: "10mb" }));
-// app.use(xssSanitizerMiddleware);
+app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 app.use(express.static("public"));
 
 app.get("/api/v1/csrf-token", (req: Request, res: Response) => {

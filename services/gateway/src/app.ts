@@ -62,6 +62,7 @@ app.use(express.json({ limit: "10mb" }));
 app.use(requestLogger);
 app.use(rateLimiter(100));
 app.use(express.static("public"));
+app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 
 app.get("/api/v1/csrf-token", (req: Request, res: Response) => {
   res.set("Cache-Control", "no-store");
