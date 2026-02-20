@@ -4,7 +4,8 @@ import http from "http";
 import app from "./app";
 import { config } from "./config/env";
 import { redisClient } from "./config/redis";
-const numCPUs = os.cpus().length - 2;
+// const numCPUs = os.cpus().length - 2;
+const numCPUs = 1;
 
 if (cluster.isPrimary) {
   console.log(`🚀 Master ${process.pid} is running`);

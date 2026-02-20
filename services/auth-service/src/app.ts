@@ -128,7 +128,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     message: "API NOT FOUND!",
     error: {
       path: req.originalUrl,
-      message: "Your requested path is not found!",
+      message: "Your auth service requested path is not found!",
     },
   });
 });

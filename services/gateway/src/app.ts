@@ -7,7 +7,6 @@ import * as Sentry from "@sentry/node";
 import { config } from "./config/env";
 import logger from "./middlewares/logger.middleware";
 import GlobalErrorHandler from "./middlewares/global.error.handler";
-import { connectKafka } from "./config/kafka";
 import router from "./routes";
 import { requestLogger } from "./middlewares/request.logger.middleware";
 import rateLimiter from "./middlewares/rateLimiter.middleware";
@@ -107,8 +106,7 @@ app.get("/", (req: Request, res: Response) => {
   res.send({ message: "Welcome to the API" });
 });
 
-app.use("/", router);
-connectKafka().catch(console.error);
+app.use("/api/v1", router);
 
 // =======================
 // Global Error Handler
@@ -124,7 +122,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     message: "API NOT FOUND!",
     error: {
       path: req.originalUrl,
-      message: "Your requested path is not found!",
+      message: "Your gateway requested path is not found!",
     },
   });
 });

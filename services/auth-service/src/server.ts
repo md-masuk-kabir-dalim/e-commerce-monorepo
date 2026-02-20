@@ -42,7 +42,7 @@ if (cluster.isPrimary) {
   async function main() {
     try {
       // Connect DB
-      initAuthServiceDb();
+      await initAuthServiceDb();
 
       // Start Kafka consumer only
       await startKafkaWorker();

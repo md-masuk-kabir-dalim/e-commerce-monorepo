@@ -1,7 +1,15 @@
 // shared/kafka/kafka.client.ts
-import { Kafka, Producer, Consumer, EachMessagePayload, logLevel } from "kafkajs";
+import {
+  Kafka,
+  Producer,
+  Consumer,
+  EachMessagePayload,
+  logLevel,
+} from "kafkajs";
 
-const KAFKA_BROKERS = (process.env.KAFKA_BROKERS || "localhost:9094").split(",");
+const KAFKA_BROKERS = (process.env.KAFKA_BROKERS || "localhost:9094").split(
+  ",",
+);
 const CLIENT_ID = process.env.KAFKA_CLIENT_ID || "microservice-client";
 
 const kafka = new Kafka({
@@ -21,7 +29,11 @@ const consumers: Record<string, Consumer> = {};
 // -------------------------------
 // Retry Helper
 // -------------------------------
-async function retry<T>(fn: () => Promise<T>, retries = 5, delay = 2000): Promise<T> {
+async function retry<T>(
+  fn: () => Promise<T>,
+  retries = 5,
+  delay = 2000,
+): Promise<T> {
   let lastError: any;
   for (let i = 0; i < retries; i++) {
     try {
@@ -38,7 +50,9 @@ async function retry<T>(fn: () => Promise<T>, retries = 5, delay = 2000): Promis
 // -------------------------------
 // Producer
 // -------------------------------
-export const getKafkaProducer = async (serviceName: string): Promise<Producer> => {
+export const getKafkaProducer = async (
+  serviceName: string,
+): Promise<Producer> => {
   if (producers[serviceName]) return producers[serviceName];
 
   const producer = kafka.producer({ allowAutoTopicCreation: true });
@@ -73,7 +87,10 @@ export const getKafkaConsumer = async (
       try {
         await eachMessage(payload);
       } catch (error) {
-        console.error(`[Kafka] Consumer handler error in ${serviceName}`, error);
+        console.error(
+          `[Kafka] Consumer handler error in ${serviceName}`,
+          error,
+        );
       }
     },
   });
@@ -84,7 +101,10 @@ export const getKafkaConsumer = async (
       await retry(() => consumer.connect());
       console.log(`[Kafka] Consumer reconnected: ${serviceName}`);
     } catch (err) {
-      console.error(`[Kafka] Failed to reconnect consumer: ${serviceName}`, err);
+      console.error(
+        `[Kafka] Failed to reconnect consumer: ${serviceName}`,
+        err,
+      );
     }
   });
 

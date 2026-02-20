@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   # -------------------------
   # ZOOKEEPER
@@ -8,10 +10,9 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
     networks:
       - microservices-net
+    restart: always
 
   # -------------------------
   # KAFKA
@@ -22,14 +23,14 @@ services:
     depends_on:
       - zookeeper
     ports:
-      - "9092:9092"   # internal docker
-      - "9094:9094"   # external localhost
+      - "9092:9092"       # internal Docker network
+      - "9094:9094"       # host access for Node.js
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 
       KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:9094
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:9094
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://host.docker.internal:9094
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
 
@@ -37,6 +38,7 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
     networks:
       - microservices-net
+    restart: always
 
   # -------------------------
   # REDIS
@@ -46,7 +48,7 @@ services:
     container_name: ecommerce-redis
     restart: always
     ports:
-      - "6380:6379"   # host:container
+      - "6380:6379"       
     networks:
       - microservices-net
 

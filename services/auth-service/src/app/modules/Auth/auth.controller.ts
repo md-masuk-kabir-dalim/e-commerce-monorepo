@@ -48,6 +48,7 @@ const loginAdmin = catchAsync(async (req: Request, res: Response) => {
    REGISTER USER
 ======================= */
 const registerUser = catchAsync(async (req: Request, res: Response) => {
+  console.log("call 99999999999999999");
   const data = req.body;
   const result = await AuthServices.registerUser(data);
 
@@ -186,7 +187,7 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   const result = await AuthServices.changePassword(
     userId,
     newPassword,
-    oldPassword
+    oldPassword,
   );
 
   sendResponse(res, {
