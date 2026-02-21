@@ -31,16 +31,6 @@ const OtpSchema: Schema<IOtp> = new Schema(
 
 OtpSchema.index({ type: 1 });
 
-let cachedOtpModel: ReturnType<typeof mongoose.model<any>> | null = null;
-
 export function getOtpModel(connection: Connection) {
-  if (cachedOtpModel) return cachedOtpModel;
-
-  cachedOtpModel = connection.model<IOtp>("Otp", OtpSchema);
-  return cachedOtpModel;
-}
-
-export async function getOtp() {
-  const connection = await getAuthConnection();
-  return getOtpModel(connection);
+  return connection.models.Otp || connection.model<IOtp>("Otp", OtpSchema);
 }

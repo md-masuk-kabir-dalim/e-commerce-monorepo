@@ -1,29 +1,44 @@
 import httpStatus from "http-status";
+import mongoose, { SortOrder } from "mongoose";
 import ApiError from "../../../errors/ApiErrors";
 import { IPaginationOptions } from "../../../interfaces/pagination";
-import { getUser, UserRole, UserStatus } from "./user.model";
-import { IUser } from "./user.interface";
 import { paginationHelpers } from "../../../utils/paginationHelper";
-import mongoose, { SortOrder } from "mongoose";
+import { getAuthConnection } from "../../../config/database";
+import { getUserModel, UserRole, UserStatus } from "./user.model";
+import { IUser } from "./user.interface";
 
-/*======================
-  update user
-  ========================
-*/
+/* =============================
+   Private helper
+============================= */
+const getUserRepository = () => {
+  const connection = getAuthConnection();
+  return getUserModel(connection);
+};
+
+/* =============================
+   Update User
+============================= */
 const updateUser = async (
   id: string,
   payload: Partial<IUser>,
 ): Promise<IUser> => {
-  const UserModel = await getUser();
-  const updatedUser = await UserModel.findByIdAndUpdate(
-    id,
-    {
-      fullName: payload.fullName,
-      phoneNo: payload.phoneNo,
-      ...(payload.image && { image: payload.image }),
-    },
-    { new: true },
-  );
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Invalid user ID");
+  }
+
+  const User = getUserRepository();
+
+  const updateData: Partial<IUser> = {
+    ...(payload.fullName && { fullName: payload.fullName }),
+    ...(payload.phoneNo && { phoneNo: payload.phoneNo }),
+    ...(payload.image && { image: payload.image }),
+  };
+
+  const updatedUser = await User.findOneAndUpdate(
+    { _id: id, status: { $ne: UserStatus.DELETED } },
+    updateData,
+    { new: true, runValidators: true },
+  ).lean();
 
   if (!updatedUser) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found");
@@ -32,21 +47,29 @@ const updateUser = async (
   return updatedUser;
 };
 
-/*==============================
-      GET PROFILE
-===============================*/
+/* =============================
+   Get My Profile
+============================= */
 const getMyProfile = async (userId: string) => {
-  const UserModel = await getUser();
-  const user = await UserModel.findById(userId);
-  if (!user) throw new ApiError(httpStatus.NOT_FOUND, "User not found");
-  const { password: _password, tokenVersion, ...userData } = user.toObject();
-  return userData;
+  const User = getUserRepository();
+
+  const user = await User.findOne({
+    _id: userId,
+    status: { $ne: UserStatus.DELETED },
+  })
+    .select("-password -tokenVersion")
+    .lean();
+
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  return user;
 };
 
-/*===========================
-   get users
-==========================
-*/
+/* =============================
+   Get Users (Admin)
+============================= */
 const getUsers = async (
   options: IPaginationOptions,
   filters: {
@@ -55,7 +78,8 @@ const getUsers = async (
     searchTerm?: string;
   },
 ) => {
-  const UserModel = await getUser();
+  const User = getUserRepository();
+
   const { page, limit, sortBy, sortOrder, skip } =
     paginationHelpers.calculatePagination(options);
 
@@ -63,6 +87,7 @@ const getUsers = async (
 
   const query: mongoose.FilterQuery<IUser> = {
     role: { $ne: UserRole.ADMIN },
+    status: { $ne: UserStatus.DELETED },
   };
 
   if (searchTerm) {
@@ -75,9 +100,9 @@ const getUsers = async (
   if (role) query.role = role;
   if (status) query.status = status;
 
-  const users = await UserModel.find(query)
+  const usersPromise = User.find(query)
     .select(
-      "id email phoneNo fullName image role status createdAt updatedAt isVerified",
+      "email phoneNo fullName image role status createdAt updatedAt isVerified",
     )
     .sort(
       sortBy && sortOrder
@@ -88,7 +113,9 @@ const getUsers = async (
     .limit(limit)
     .lean();
 
-  const total = await UserModel.countDocuments(query);
+  const totalPromise = User.countDocuments(query);
+
+  const [users, total] = await Promise.all([usersPromise, totalPromise]);
 
   return {
     meta: { total, page, limit },
@@ -96,13 +123,16 @@ const getUsers = async (
   };
 };
 
-/*========================
-  get user by ID
-=============================
-*/
+/* =============================
+   Get User By ID
+============================= */
 const getUserById = async (id: string): Promise<IUser> => {
-  const UserModel = await getUser();
-  const user = await UserModel.findById(id);
+  const User = getUserRepository();
+
+  const user = await User.findOne({
+    _id: id,
+    status: { $ne: UserStatus.DELETED },
+  }).lean();
 
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found");
@@ -111,19 +141,20 @@ const getUserById = async (id: string): Promise<IUser> => {
   return user;
 };
 
-/*================================
-   delete user
-=================================
-**/
+/* =============================
+   Soft Delete User
+============================= */
 const deleteUser = async (userId: string): Promise<void> => {
-  const UserModel = await getUser();
-  const user = await UserModel.findById(userId);
-  if (!user) {
+  const User = getUserRepository();
+
+  const result = await User.updateOne(
+    { _id: userId },
+    { status: UserStatus.DELETED },
+  );
+
+  if (result.matchedCount === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found");
   }
-
-  user.status = UserStatus.DELETED;
-  await user.save();
 };
 
 export const UserService = {

@@ -54,16 +54,6 @@ UserSchema.index({ status: 1 });
 UserSchema.index({ createdAt: 1 });
 UserSchema.index({ updatedAt: 1 });
 
-let cachedUserModel: ReturnType<typeof model<any>> | null = null;
-
 export function getUserModel(connection: Connection) {
-  if (cachedUserModel) return cachedUserModel;
-
-  cachedUserModel = connection.model<IUser>("User", UserSchema);
-  return cachedUserModel;
-}
-
-export async function getUser() {
-  const connection = await getAuthConnection();
-  return getUserModel(connection);
+  return connection.models.User || connection.model<IUser>("User", UserSchema);
 }

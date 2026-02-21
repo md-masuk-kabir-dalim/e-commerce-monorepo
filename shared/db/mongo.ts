@@ -2,9 +2,13 @@ import mongoose from "mongoose";
 
 export function createMongoConnection(dbName: string, uri: string) {
   const connection = mongoose.createConnection(uri, {
-    autoIndex: true,
-    maxPoolSize: 10,
+    autoIndex: false,
+    maxPoolSize: 50,
+    minPoolSize: 10,
     serverSelectionTimeoutMS: 10000,
+    retryWrites: true,
+    w: "majority",
+    bufferCommands: false,
   });
 
   connection.on("connected", () => console.log(`🟢 Connected to ${dbName}`));
