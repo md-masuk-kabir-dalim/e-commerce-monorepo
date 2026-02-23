@@ -9,7 +9,7 @@ const ProductSchema = new Schema<IProduct>(
     originalPrice: { type: Number, default: 0 },
     categoryId: {
       type: Schema.Types.ObjectId,
-      ref: "Category",
+      ref: "Categories",
       required: true,
     },
     rating: { type: Number, default: 0 },

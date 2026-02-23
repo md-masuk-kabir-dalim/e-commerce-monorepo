@@ -63,10 +63,10 @@ const getAllProducts = async (query: any) => {
     sortOrder: query.sortOrder || "desc",
     select:
       "id name slug price inStock stock originalPrice rating categoryId images",
-    populate: [
-      { path: "categoryId", select: "name slug" },
-      { path: "images", select: "url altText description" },
-    ],
+    // populate: [
+    //   { path: "categoryId", select: "name slug" },
+    //   { path: "images", select: "url altText description" },
+    // ],
   });
 };
 
