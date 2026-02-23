@@ -14,10 +14,10 @@ const handlers: {
   },
 };
 
-export const initAuthKafka = async () => {
+export const initImagesKafka = async () => {
   await getKafkaConsumer(
-    "auth-service",
-    "auth-service-group",
+    "images-service",
+    "images-service-group",
     Object.values(Topics),
     async ({ topic, message }) => {
       if (!message.value) return;

@@ -14,10 +14,10 @@ const handlers: {
   },
 };
 
-export const initAuthKafka = async () => {
+export const initProductsKafka = async () => {
   await getKafkaConsumer(
-    "auth-service",
-    "auth-service-group",
+    "products-service",
+    "products-service-group",
     Object.values(Topics),
     async ({ topic, message }) => {
       if (!message.value) return;
