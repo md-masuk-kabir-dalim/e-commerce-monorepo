@@ -12,6 +12,9 @@ const handlers: {
   [Topics.ORDER_CREATED]: async (data: OrderCreatedEvent) => {
     console.log("Handle order created:", data);
   },
+  [Topics.PRODUCT_IMAGE_DELETE]: async (data: OrderCreatedEvent) => {
+    console.log("Handle product image created:", data);
+  },
 };
 
 export const initImagesKafka = async () => {
