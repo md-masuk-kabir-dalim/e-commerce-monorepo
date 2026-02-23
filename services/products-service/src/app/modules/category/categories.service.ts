@@ -1,9 +1,16 @@
-import { imageService } from "../Image/image.service";
 import { Image } from "../../../interfaces/common";
-import { Category } from "./category.model";
+import { getCategoryModel } from "./category.model";
 import { ICategory } from "./category.interface";
 import { searchPaginate } from "../../../helpers/searchPaginate";
 import { generateUniqueIdentifier } from "../../../helpers/generateUniqueIdentifier";
+import { getAuthConnection } from "services/products-service/src/config/database";
+/* =============================
+   Private helper
+============================= */
+const getCategoryRepository = () => {
+  const connection = getAuthConnection();
+  return getCategoryModel(connection);
+};
 
 export interface CreateCategoryInput {
   name: string;
@@ -13,6 +20,7 @@ export interface CreateCategoryInput {
 export const CategoryService = {
   // CREATE
   create: async (payload: CreateCategoryInput) => {
+    const Category = await getCategoryRepository();
     const slug = await generateUniqueIdentifier(Category, payload.name, "slug");
 
     const category = new Category({
@@ -27,6 +35,7 @@ export const CategoryService = {
 
   // UPDATE
   update: async (id: string, payload: Partial<ICategory>) => {
+    const Category = await getCategoryRepository();
     const category = await Category.findByIdAndUpdate(id, payload, {
       new: true,
     });
@@ -35,13 +44,10 @@ export const CategoryService = {
 
   // DELETE
   delete: async (id: string) => {
+    const Category = await getCategoryRepository();
     const category = await Category.findById(id);
 
     if (!category) return null;
-
-    if (category.image?.publicId) {
-      await imageService.deleteFromCloudinary(category.image.publicId);
-    }
 
     await category.deleteOne();
     return { message: "Category deleted successfully" };
@@ -53,6 +59,7 @@ export const CategoryService = {
     limit?: number;
     searchQuery?: string;
   }) => {
+    const Category = await getCategoryRepository();
     const { page = 1, limit = 10, searchQuery = "" } = query;
 
     return searchPaginate<ICategory>({
@@ -68,11 +75,13 @@ export const CategoryService = {
 
   // GET BY ID
   getById: async (id: string) => {
+    const Category = await getCategoryRepository();
     return Category.findById(id);
   },
 
   // GET HOME PAGE DATA
   getHomeData: async () => {
+    const Category = await getCategoryRepository();
     const sections = await Category.aggregate([
       { $sort: { priority: 1 } },
       { $limit: 5 }, // top 5 categories

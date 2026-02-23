@@ -1,6 +1,6 @@
-import { Schema, model } from "mongoose";
+import { Connection, Schema, model } from "mongoose";
 import { IProduct } from "./product.interface";
-import { ImageSchema } from "../Image/image.model";
+import { ImageSchema } from "services/products-service/src/shared/Image.schema";
 
 const ProductSchema = new Schema<IProduct>(
   {
@@ -24,7 +24,7 @@ const ProductSchema = new Schema<IProduct>(
     metaDescription: { type: String },
     metaKeywords: [{ type: String }],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 ProductSchema.index({ createdAt: 1 });
@@ -34,4 +34,9 @@ ProductSchema.index({ price: 1 });
 ProductSchema.index({ name: "text", slug: "text" });
 ProductSchema.index({ originalPrice: 1 });
 
-export const Product = model<IProduct>("Product", ProductSchema);
+export function getProductsModel(connection: Connection) {
+  return (
+    connection.models.Products ||
+    connection.model<IProduct>("Products", ProductSchema)
+  );
+}

@@ -1,7 +1,6 @@
-import { Schema, model } from "mongoose";
+import { Connection, Schema, model } from "mongoose";
 import { ICategory } from "./category.interface";
-import { ImageSchema } from "../Image/image.model";
-
+import { ImageSchema } from "services/products-service/src/shared/Image.schema";
 
 const CategorySchema = new Schema<ICategory>(
   {
@@ -9,9 +8,14 @@ const CategorySchema = new Schema<ICategory>(
     slug: { type: String, required: true, unique: true },
     image: { type: ImageSchema, required: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 CategorySchema.index({ name: 1 });
 
-export const Category = model<ICategory>("Category", CategorySchema);
+export function getCategoryModel(connection: Connection) {
+  return (
+    connection.models.Categories ||
+    connection.model<ICategory>("Categories", CategorySchema)
+  );
+}

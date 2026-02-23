@@ -3,14 +3,22 @@ import dotenv from "dotenv";
 import { Readable } from "stream";
 import sharp from "sharp";
 import config from "../../../config";
-
+import { getAuthConnection } from "services/image-service/src/config/database";
+import { getImagesModel } from "./image.model";
 dotenv.config();
-
 cloudinary.config({
   cloud_name: config.cloudinary.cloud_name,
   api_key: config.cloudinary.api_key,
   api_secret: config.cloudinary.api_secret,
 });
+
+/* =============================
+   Private helper
+============================= */
+const getImagesRepository = () => {
+  const connection = getAuthConnection();
+  return getImagesModel(connection);
+};
 
 /**
  * Convert image buffer to WebP with optional width resizing
@@ -42,7 +50,7 @@ const uploadToCloudinary = async (buffer: Buffer, folder: string) => {
       (err, result) => {
         if (err) return reject(err);
         resolve(result);
-      }
+      },
     );
 
     readable.pipe(stream);
